@@ -26,10 +26,6 @@
        例如 20200417-bug-sjy-test
 - 然后根据新功能需求写 代码 或者 根据 bug 文档去修改 bug
 
-![流程图](https://confluence.mysre.cn/download/attachments/24320830/2.png?version=1&modificationDate=1587379760000&api=v2)
-
-### 3. 项目代码发布版本
-
 - 代码写完后如果是测试需要把当前开发分支的代码提交
 
   1. 如果是测试环境 需要把当前开发分支的代码合并到 origin/dev 分支上
@@ -40,6 +36,12 @@
     切记都是从当前开发分支 去 直接合并到 dev 或者 alpha 或者 master 不能 把 dev 合并到 alpha 或者 alpha 合并到 master
   - 原因：
     可能并不是所有的测试 或者 alpha 的 代码都需要上线 可能会导致需要和不需要上线的功能都到 master 导致代码的一些冲突回滚问题很难解决 所以都一定要从当前开发分支直接合并到对应要上的版本的分支
+
+![流程图](https://confluence.mysre.cn/download/attachments/24320830/2.png?version=1&modificationDate=1587379760000&api=v2)
+
+### 3. 项目代码发布版本
+
+
 
 - 代码合并完成后在当前需要发布的分支上去执行发布命令
 
