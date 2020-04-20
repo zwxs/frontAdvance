@@ -5,7 +5,9 @@
 - 首先项目代码格式化需使用 prettier 格式化  
     1. 使用插件 npm run format  格式化
     2. 使用vscode的 Prettier - Code formatter 插件 然后把保存码格式化 选项改为当前插件的格式化方式
-    
+
+![流程图](http://baidu.com/pic/doge.png)
+
 ### 2. 项目分支开发
 
 - 克隆项目 拉取master分支最新代码
@@ -24,6 +26,7 @@
             例如20200417-bug-sjy-test
 - 然后根据新功能需求写 代码 或者 根据bug文档去修改bug
 
+![流程图](http://baidu.com/pic/doge.png)
 
 ### 3. 项目代码发布版本
 
@@ -55,9 +58,14 @@
             1. 最好是吧git升级到最新版本 2.14 以上都可以 (推荐)
             2. 修改项目根目录的 czhome.js 里面的判断 把 nothing to commit, working tree clean 改成  nothing to commit, working directory clean
    
+![流程图](http://baidu.com/pic/doge.png)
+
+### 4. 项目部署
+
 - 项目发布完成后 打开 jenkins 自动化处理项目工作台 https://tool-jenkins.mysre.cn/
     1. 找到当前发布的项目 czsaas-test-czhome-ycg 并进入
     2. 点击 左上角 Build with Parameters  配置项目的发布的参数
     3. 选择当前要发布项目的分支 origin/dev 或者  origin/alpha 或者 origin/master
     4. 后面打上发布的备注tag
     5. 点击开始构建 等待完成即可 打开项目地址预览发布效果
+![流程图](http://baidu.com/pic/doge.png)
