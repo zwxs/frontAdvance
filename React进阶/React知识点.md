@@ -4,9 +4,9 @@
 
 - 作用： 因为react 中 render渲染函数需要一个返回值 返回要渲染的组件或者元素 当组件过多的时候 通常会在外层包裹一个div
 但是包一个div结构就多了一层 所以React官方提供了一个 Fragment(片段组件) 用来包裹我们的组件 并且不会多出一层 其实原理类似于Vue中的 <template></template> 组件
- 
+
 - 实际项目中用法如下
-```js
+```jsx
     import React, { Component, Fragment } from 'react';
     <Fragment>
     {developer.welcome && <h1 className={styles.welcome}>{developer.welcome}</h1>}
@@ -22,7 +22,7 @@
 
 - 实际项目中用法如下
 
-```js
+```jsx
     import classnames from 'classnames';
     <div key={i} className={classes.item} style={{ width: itemWidth }}>
         <Link className={classnames(classes.link, linkClass)}>
@@ -109,7 +109,7 @@
 
 ### 4. 当view 层某个组件过于复杂的 结构层次很多的时候尽可能抽离成多个小组件 提高组件复用性和组件代码的可读性
 
-```js
+```jsx
 // 创建 视图里面需要的一个小区块组件
 const Section = props => {
    return (
@@ -146,7 +146,7 @@ const Section = props => {
 
 ### 5. 若视图中有遇到逻辑判断等操作 提出来到JS中处理 视图只尽可能做渲染 不做逻辑判断
 
-```js
+```jsx
   // 根据不同类型 判断跳转到不同的链接
   let link = `/${getTenantCode()}/bid-notice/detail?post_id=${props.id}&bid_id=${props.bid_id}`;
   if (props.bidNoticeType) {
@@ -167,7 +167,7 @@ const Section = props => {
   }
 ```
 
-```html
+```jsx
 <div className={styles.section}>
   <div className={styles.item}>
     <Link to={link} className={styles.tit}>
@@ -192,7 +192,7 @@ const Section = props => {
 
 1. 导入mobox容器 并在根组件中使用
 
-```js
+```jsx
 import { Provider } from 'mobx-react';
 
 ReactDOM.render(
@@ -205,7 +205,7 @@ ReactDOM.render(
 
 2. 在根组件 导入状态集合对象 并注入到 Provider 容器中
 
-```js
+```jsx
 import * as stores from './stores/index';
 <Provider {...stores}>
   ...
@@ -214,7 +214,7 @@ import * as stores from './stores/index';
 
 3. 定义各类 状态管理的文件 然后统一融合到 状态集合对象里面 
 - 单个状态管理文件 WebConfig.js
-```js  
+```jsx
 // 定义状态状态类
 class WebConfig {
   // @observable 装饰器 类似于 let const 定义状态类里面的同步的全局变量 值可以是任意的JS类型的数据 区别就是 observable 的属性值在其变化的时候 mobx 会自动追踪并作出响应 就是当状态变化的时候 在组件中能够及时获取到变化后的状态
