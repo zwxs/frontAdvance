@@ -4,9 +4,9 @@
 
 - 作用： 因为react 中 render渲染函数需要一个返回值 返回要渲染的组件或者元素 当组件过多的时候 通常会在外层包裹一个div
 但是包一个div结构就多了一层 所以React官方提供了一个 Fragment(片段组件) 用来包裹我们的组件 并且不会多出一层 其实原理类似于Vue中的 <template></template> 组件
- 
+
 - 实际项目中用法如下
-```js
+```jsx
     import React, { Component, Fragment } from 'react';
     <Fragment>
     {developer.welcome && <h1 className={styles.welcome}>{developer.welcome}</h1>}
@@ -22,7 +22,7 @@
 
 - 实际项目中用法如下
 
-```js
+```jsx
     import classnames from 'classnames';
     <div key={i} className={classes.item} style={{ width: itemWidth }}>
         <Link className={classnames(classes.link, linkClass)}>
@@ -109,7 +109,7 @@
 
 ### 4. 当view 层某个组件过于复杂的 结构层次很多的时候尽可能抽离成多个小组件 提高组件复用性和组件代码的可读性
 
-```js
+```jsx
 // 创建 视图里面需要的一个小区块组件
 const Section = props => {
    return (
@@ -146,7 +146,7 @@ const Section = props => {
 
 ### 5. 若视图中有遇到逻辑判断等操作 提出来到JS中处理 视图只尽可能做渲染 不做逻辑判断
 
-```js
+```jsx
   // 根据不同类型 判断跳转到不同的链接
   let link = `/${getTenantCode()}/bid-notice/detail?post_id=${props.id}&bid_id=${props.bid_id}`;
   if (props.bidNoticeType) {
@@ -167,7 +167,7 @@ const Section = props => {
   }
 ```
 
-```html
+```jsx
 <div className={styles.section}>
   <div className={styles.item}>
     <Link to={link} className={styles.tit}>
@@ -192,7 +192,7 @@ const Section = props => {
 
 1. 导入mobox容器 并在根组件中使用
 
-```js
+```jsx
 import { Provider } from 'mobx-react';
 
 ReactDOM.render(
@@ -205,7 +205,7 @@ ReactDOM.render(
 
 2. 在根组件 导入状态集合对象 并注入到 Provider 容器中
 
-```js
+```jsx
 import * as stores from './stores/index';
 <Provider {...stores}>
   ...
@@ -214,7 +214,7 @@ import * as stores from './stores/index';
 
 3. 定义各类 状态管理的文件 然后统一融合到 状态集合对象里面 
 - 单个状态管理文件 WebConfig.js
-```js  
+```jsx
 // 定义状态状态类
 class WebConfig {
   // @observable 装饰器 类似于 let const 定义状态类里面的同步的全局变量 值可以是任意的JS类型的数据 区别就是 observable 的属性值在其变化的时候 mobx 会自动追踪并作出响应 就是当状态变化的时候 在组件中能够及时获取到变化后的状态
@@ -258,66 +258,212 @@ import { inject, observer } from 'mobx-react';
 let primary = this.props.webConfig.primaryColor;
 ```
 
-## 前端项目开发流程
 
-### 1. 代码规范和格式化
+### 7. React 中 定义组件的2种方式 函数组件 和 普通组件
 
-- 首先项目代码格式化需使用 prettier 格式化  
-    1. 使用插件 npm run format  格式化
-    2. 使用vscode的 Prettier - Code formatter 插件 然后把保存码格式化 选项改为当前插件的格式化方式
-    
-### 2. 项目分支开发
+#### 7.1 普通组件 也可以通过TS的泛型定义组件的 props的类型 
 
-- 克隆项目 拉取master分支最新代码
-
-- 新需求开发 需要创建新的开发分支 
-    - 分支名称命名规范: 日期-当月迭代更新次数-租户名称[-功能]  
-        1. 如果是基础标准代码的就使用 standard
-            例如 20200417-sp4-standard-test 
-        2. 如果是单个租户的 代码的就使用 租户简写  
-            例如20200417-sp4-sjy-test
-- 如果是项目原有bug修改 也创建新的开发分支
-    - 分支名称命名规范: 日期-bug-租户名称[-功能]  如
-        1. 如果是基础标准代码的就使用 standard
-            例如 20200417-bug-standard-test 
-        2. 如果是单个租户的代码的就使用 租户简写  
-            例如20200417-bug-sjy-test
-- 然后根据新功能需求写 代码 或者 根据bug文档去修改bug
-
-
-### 3. 项目代码发布版本
-
-- 代码写完后如果是测试需要把当前开发分支的代码提交 
-    1. 如果是测试环境 需要把当前开发分支的代码合并到 origin/dev 分支上 
-    2. 如果是镜像环境 需要把当前开发分支的代码合并到 origin/alpha 分支上
-    3. 如果是正式环境 需要把当前开发分支的代码合并到 origin/master 分支上  
-    - 注意: 
-        切记都是从当前开发分支 去 直接合并到 dev 或者 alpha  或者 master 不能 把dev合并到alpha 或者 alpha合并到master
-    - 原因： 
-        可能并不是所有的测试 或者 alpha 的 代码都需要上线  可能会导致需要和不需要上线的功能都到master 导致代码的一些冲突回滚问题很难解决 所以都一定要从当前开发分支直接合并到对应要上的版本的分支
-
-- 代码合并完成后在当前需要发布的分支上去执行发布命令
-    1. 使用cmd 输入npm命令 npm run publish
-    2. 使用vscode插件底部的 npm 脚本 选中当前项目找到对应的publish去点击发布
-
-    3. 发布过程中可能会遇到一些问题
-        - 未指定发布项目的 本地目录地址
-            1. 在项目根目录 创建一个 .env.local 的配置文件
-            2. 在文件中 写入当前发布项目的本地目录地址      
-                CZHOME_PUBLIC_PATH=C:\Users\zhengw16\Desktop\workspace\czhome\public\czbms
-            3. 如果项目在C盘 或者 没有完全取得读写权限可能会报错 需要设置项目读写权限或者放入其他盘
-        - git版本问题 不同的git版本 提交成功后返回的log信息不一样
-            在 新版本的git 返回成功日志 
-            nothing to commit, working tree clean
-            在 旧版本的git 返回成功日志
-            nothing to commit, working directory clean
-            此时解决方案
-            1. 最好是吧git升级到最新版本 2.14 以上都可以 (推荐)
-            2. 修改项目根目录的 czhome.js 里面的判断 把 nothing to commit, working tree clean 改成  nothing to commit, working directory clean
+```jsx
+import React, { Component } from 'react';
+interface IProps {
+  group?: any;
+}
+class ArchiveGroup extends Component<IProps> {
+  state = {
    
-- 项目发布完成后 打开 jenkins 自动化处理项目工作台 https://tool-jenkins.mysre.cn/
-    1. 找到当前发布的项目 czsaas-test-czhome-ycg 并进入
-    2. 点击 左上角 Build with Parameters  配置项目的发布的参数
-    3. 选择当前要发布项目的分支 origin/dev 或者  origin/alpha 或者 origin/master
-    4. 后面打上发布的备注tag
-    5. 点击开始构建 等待完成即可 打开项目地址预览发布效果
+  };
+  componentDidMount() {
+    // 使用自定义的props的group
+    console.log(this.props.group)
+  }
+  render() {
+    return (
+      <div>
+      组件元素内容
+      </div>
+    )
+  }
+}
+```
+
+- 普通组件的特点: 保留React组件的基本功能 state 生命 周期 render 渲染函数等等
+
+#### 7.2 函数组件 也可以通过TS的泛型定义组件的 props的类型 
+
+```jsx
+import React from 'react';
+interface IProps {
+  template?: any;
+}
+const ArchiveNav: React.FC<IProps> = ({ template}) => {
+  console.log(template)
+  return (
+    <div>
+      组件元素内容
+    </div>
+  )
+}
+```
+
+- 函数组件的方式特点: 
+  类似于函数一样 写法比较简洁 然后 也可以定义组件的props类型 通过函数传参的方式 使用 对应的 props 属性
+也不需要写render函数 直接 return 返回组件的内容
+- 函数组件的方式缺点: 
+  没有组件的生命周期 所以需要用到生命周期的情况要使用普通组件
+
+
+
+### 8. Redux配合 reduxjs/toolkit 状态管理
+
+#### 8.1  创建需要管理的状态的模块 Reducer
+
+- Reducer的含义和作用 ： reducer是一种高阶函数 他的作用就是用来管理 状态的 state 和 action 进行一些操作返回新的state 也可以理解为state 和 action的容器)
+
+- 创建步骤
+1. 首先引入 reduxjs的工具包 reduxjs/toolkit
+```js
+  import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
+```
+2. 定义当前状态模块 需要管理的状态属性
+```js
+  const initialState = {
+      属性:默认值
+  };
+```
+3. 定义一些异步请求接口的函数
+```jsx
+export const getAreaData = createAsyncThunk('area/getAreaData', async () => {
+  return (await apiFetch(api.getAreaList)) as any;
+});
+```
+4. 创建 当前状态模块
+使用reduxjs/toolkit 工具包提供的createSlice 函数可以创建状态模块的对象
+函数需要传入参数
+  1. name 模块名称
+  2. 当前状态模块 初始化属性对象
+  3. reducer 函数
+  4. extraReducers 额外的reducer函数
+
+```jsx
+    const archive = createSlice({
+    name: 'archive',
+    initialState,
+    reducers: {    
+      setState(state, action) {
+        // 这里面可以做一些数据处理然后更新状态 action.payload 可以获取到当前调用这个函数传递过来的参数值
+        state = Object.assign(state, action.payload);
+      },
+    },
+    extraReducers: (builder) => {
+      // 在扩展 reducer函数 里面的参数 builder 是一个 reducers映射对象的容器
+      // getArchiveData 是当前定义的异步数据请求函数 通过 addCase 当用到此数据的时候会去调用对应接口
+      // 会将异步返回的数据 返回到action.payload中 state是当前的状态
+      builder.addCase(getArchiveData.fulfilled, (state, action) => {     
+        const data = action.payload;
+        // 可以对数据做一些处理然后赋值到状态状态对象的属性上
+        state.template = data.template;
+      });
+    
+    },
+  });
+
+```
+
+5. 导出当前 状态模块的reducer 和 模块里面的action动作
+
+```jsx
+export default area.reducer;
+export const areaActions = area.actions;
+```
+
+#### 8.2 然后将每个状态小模块在 整个状态对象中统一打包引入
+
+1.  引入  reduxjs/toolkit 工具  和各个模块
+```jsx
+import { configureStore, combineReducers } from '@reduxjs/toolkit';
+import user from './userReducer';
+import archive from './archiveReducer';
+...
+```
+2. 创建根Reducer 把所有小模块的Reducer统一合并到一个 根Reducer中
+```jsx
+const rootReducer = combineReducers({
+  user,
+  archive
+  ...
+});
+
+```
+3. 然后将 根Reducer 作为根状态RootState导出
+
+```jsx
+export type RootState = ReturnType<typeof rootReducer>;
+```
+
+4. 然后创建状态对象实例对象 和 分发对象  并导出
+
+```jsx
+const store = configureStore({
+  reducer: rootReducer,
+});
+export type AppDispatch = typeof store.dispatch;
+
+export default store;
+```
+
+#### 8.3 在组件中使用状态
+
+1. 引入 redux 状态到props的映射器 分发对象  根状态 和需要使用到的模块
+
+```jsx
+import { connect } from 'react-redux';
+import { AppDispatch, RootState } from '../../reducers';
+import { getArchiveData } from '../../reducers/archiveReducer';
+```
+2. 将AppDispatch 分发对象 映射到当前组件 props中
+
+1. 定义当前组件 类型接口
+``` jsx
+interface ArchiveProps {
+  dispatch: AppDispatch;
+  companyLogo: string; // 公司logo
+  companyName: string; // 公司名称
+  archive: any;
+}
+```
+
+2. 创建当前页面组件并且使用 当前类型接口
+```jsx
+ class Archive extends Component<ArchiveProps>
+```
+
+3. 当组件渲染完成 后调用异步请求函数 执行当前 状态模块里面的异步请求函数
+
+```jsx
+  componentDidMount() {
+    this.fetchData();
+  }
+
+  async fetchData() {
+    try {
+      await Promise.all([this.props.dispatch(getArchiveData())]);
+    } catch (e) {}
+  }
+```
+
+4. 创建状态到props的映射器 将 当前根状态里面的对应状态属性 映射到当前组件实例的props中
+
+```jsx
+const mapStateToProps = (state: RootState) => ({
+  archive: state.archive,
+});
+
+export default connect(mapStateToProps)(Archive);
+
+```
+
+5. 然后在组件中的render函数里面 使用this.props. 对应的熟悉就能获取到state中对应的熟悉 
+```jsx
+console.log( this.props.archive)
+const { template } = this.props.archive;// 可以直接使用 也可以通过结构赋值赋值取出到变量中
+```

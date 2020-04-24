@@ -257,3 +257,213 @@ import { inject, observer } from 'mobx-react';
 // this.props.webConfig.primaryColor:这个就是如何使用数据源中的值.就和父子组件传参一样  使用 this.props.状态实例对象.里面的状态属性 取值
 let primary = this.props.webConfig.primaryColor;
 ```
+
+
+### 7. React 中 定义组件的2种方式 函数组件 和 普通组件
+
+#### 7.1 普通组件 也可以通过TS的泛型定义组件的 props的类型 
+
+```jsx
+import React, { Component } from 'react';
+interface IProps {
+  group?: any;
+}
+class ArchiveGroup extends Component<IProps> {
+  state = {
+   
+  };
+  componentDidMount() {
+    // 使用自定义的props的group
+    console.log(this.props.group)
+  }
+  render() {
+    return (
+      <div>
+      组件元素内容
+      </div>
+    )
+  }
+}
+```
+
+- 普通组件的特点: 保留React组件的基本功能 state 生命 周期 render 渲染函数等等
+
+#### 7.2 函数组件 也可以通过TS的泛型定义组件的 props的类型 
+
+```jsx
+import React from 'react';
+interface IProps {
+  template?: any;
+}
+const ArchiveNav: React.FC<IProps> = ({ template}) => {
+  console.log(template)
+  return (
+    <div>
+      组件元素内容
+    </div>
+  )
+}
+```
+
+- 函数组件的方式特点: 
+  类似于函数一样 写法比较简洁 然后 也可以定义组件的props类型 通过函数传参的方式 使用 对应的 props 属性
+也不需要写render函数 直接 return 返回组件的内容
+- 函数组件的方式缺点: 
+  没有组件的生命周期 所以需要用到生命周期的情况要使用普通组件
+
+
+
+### 8. Redux配合 reduxjs/toolkit 状态管理
+
+#### 8.1  创建需要管理的状态的模块 Reducer
+
+- Reducer的含义和作用 ： reducer是一种高阶函数 他的作用就是用来管理 状态的 state 和 action 进行一些操作返回新的state 也可以理解为state 和 action的容器)
+
+- 创建步骤
+1. 首先引入 reduxjs的工具包 reduxjs/toolkit
+```js
+  import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
+```
+2. 定义当前状态模块 需要管理的状态属性
+```js
+  const initialState = {
+      属性:默认值
+  };
+```
+3. 定义一些异步请求接口的函数
+```jsx
+export const getAreaData = createAsyncThunk('area/getAreaData', async () => {
+  return (await apiFetch(api.getAreaList)) as any;
+});
+```
+4. 创建 当前状态模块
+使用reduxjs/toolkit 工具包提供的createSlice 函数可以创建状态模块的对象
+函数需要传入参数
+  1. name 模块名称
+  2. 当前状态模块 初始化属性对象
+  3. reducer 函数
+  4. extraReducers 额外的reducer函数
+
+```jsx
+    const archive = createSlice({
+    name: 'archive',
+    initialState,
+    reducers: {    
+      setState(state, action) {
+        // 这里面可以做一些数据处理然后更新状态 action.payload 可以获取到当前调用这个函数传递过来的参数值
+        state = Object.assign(state, action.payload);
+      },
+    },
+    extraReducers: (builder) => {
+      // 在扩展 reducer函数 里面的参数 builder 是一个 reducers映射对象的容器
+      // getArchiveData 是当前定义的异步数据请求函数 通过 addCase 当用到此数据的时候会去调用对应接口
+      // 会将异步返回的数据 返回到action.payload中 state是当前的状态
+      builder.addCase(getArchiveData.fulfilled, (state, action) => {     
+        const data = action.payload;
+        // 可以对数据做一些处理然后赋值到状态状态对象的属性上
+        state.template = data.template;
+      });
+    
+    },
+  });
+
+```
+
+5. 导出当前 状态模块的reducer 和 模块里面的action动作
+
+```jsx
+export default area.reducer;
+export const areaActions = area.actions;
+```
+
+#### 8.2 然后将每个状态小模块在 整个状态对象中统一打包引入
+
+1.  引入  reduxjs/toolkit 工具  和各个模块
+```jsx
+import { configureStore, combineReducers } from '@reduxjs/toolkit';
+import user from './userReducer';
+import archive from './archiveReducer';
+...
+```
+2. 创建根Reducer 把所有小模块的Reducer统一合并到一个 根Reducer中
+```jsx
+const rootReducer = combineReducers({
+  user,
+  archive
+  ...
+});
+
+```
+3. 然后将 根Reducer 作为根状态RootState导出
+
+```jsx
+export type RootState = ReturnType<typeof rootReducer>;
+```
+
+4. 然后创建状态对象实例对象 和 分发对象  并导出
+
+```jsx
+const store = configureStore({
+  reducer: rootReducer,
+});
+export type AppDispatch = typeof store.dispatch;
+
+export default store;
+```
+
+#### 8.3 在组件中使用状态
+
+1. 引入 redux 状态到props的映射器 分发对象  根状态 和需要使用到的模块
+
+```jsx
+import { connect } from 'react-redux';
+import { AppDispatch, RootState } from '../../reducers';
+import { getArchiveData } from '../../reducers/archiveReducer';
+```
+2. 将AppDispatch 分发对象 映射到当前组件 props中
+
+1. 定义当前组件 类型接口
+``` jsx
+interface ArchiveProps {
+  dispatch: AppDispatch;
+  companyLogo: string; // 公司logo
+  companyName: string; // 公司名称
+  archive: any;
+}
+```
+
+2. 创建当前页面组件并且使用 当前类型接口
+```jsx
+ class Archive extends Component<ArchiveProps>
+```
+
+3. 当组件渲染完成 后调用异步请求函数 执行当前 状态模块里面的异步请求函数
+
+```jsx
+  componentDidMount() {
+    this.fetchData();
+  }
+
+  async fetchData() {
+    try {
+      await Promise.all([this.props.dispatch(getArchiveData())]);
+    } catch (e) {}
+  }
+```
+
+4. 创建状态到props的映射器 将 当前根状态里面的对应状态属性 映射到当前组件实例的props中
+
+```jsx
+const mapStateToProps = (state: RootState) => ({
+  archive: state.archive,
+});
+
+export default connect(mapStateToProps)(Archive);
+
+```
+
+5. 然后在组件中的render函数里面 使用this.props. 对应的熟悉就能获取到state中对应的熟悉 
+```jsx
+console.log( this.props.archive)
+const { template } = this.props.archive;// 可以直接使用 也可以通过结构赋值赋值取出到变量中
+```
