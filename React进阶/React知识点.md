@@ -467,3 +467,92 @@ export default connect(mapStateToProps)(Archive);
 console.log( this.props.archive)
 const { template } = this.props.archive;// 可以直接使用 也可以通过结构赋值赋值取出到变量中
 ```
+
+### 9. React 中的 ref使用 以及如何获取操作DOM元素
+
+1. 首先要创建ref对象 
+
+```jsx
+const ref = useRef<HTMLDivElement | null>(null);
+```
+
+2. 在你需要添加ref的元素上去设置ref属性  并且绑定当前的dom元素到ref对象上
+
+```jsx
+<div ref={(instance: HTMLDivElement) => (ref.current = instance)} >
+</div>
+```
+
+- 写法是以一个箭头函数的形式来设置ref 里面的instance参数就是当前的DOM元素 如果确定dom元素的类型可以写具体的类型
+如果不确定可以写any
+- 然后将instance的dom对象赋值给ref对象的current属性身上 (current属性是ref对象默认有的属性)
+
+3. 使用当前 ref对象来获取dom和操作元素
+
+```jsx
+let refDom: any = ref.current;
+console.log(refDom.offsetTop)
+```
+
+- 因为上面我们已经定义了ref对象并且讲dom元素赋值给了其中的current属性 那么通过这个属性拿到的就是dom元素
+可以使用原生的dom属性上的属性方法 例如 offsetTop元素顶部的距离 也可以添加事件等等
+
+4. 如果一个ref对象想要绑定多个dom元素 也可以把current属性作为一个数组 存储多个dom元素
+
+```jsx
+const ref = useRef<{ [key: string]: HTMLDivElement }>({});
+<div ref={(instance: HTMLDivElement) => (ref.current[item.tab_code] = instance) }>
+</div>
+<div ref={(instance: HTMLDivElement) => (ref.current['contact'] = instance)} >
+</div>
+let refs = ref.current;
+let tabTopArr = [];
+for (let key in refs) {
+  let Dom = refs[key];
+  if (Array.isArray(Dom)) {
+    Dom = Dom[0];
+  }
+  tabTopArr.push({
+    top: Dom.offsetTop,
+    code: key,
+    topHeight: Dom.offsetTop + Dom.offsetHeight,
+  });
+}
+```
+
+- 此时的定义方式 设置方式 和使用方式都有一定的变化
+原理就是把current属性当成一个数组来使用
+
+### 10. React中的Hooks函数的作用和使用方式
+
+- 首先 hooks函数的作用就是为了让函数组件拥有像类组件一样的state 生命周期等特点 要实现这一系列功能需要灵活应用里面的API
+
+1. useState : 作用 在函数组件里面创建组件的state (区别于普通的变量就是state 数据变化了会触发组件更新 而普通变量不会)
+
+2. useState 使用方式
+
+- 首先要引入useState函数 并通过此函数创建需要的state变量
+```jsx
+ import React, { useCallback, useEffect, useRef ,useState} from 'react';
+ let [fix,setFix] = useState(false);
+ useState函数的参数的值是当要创建的state变量的值 函数会返回2个值 
+    第一个值是当前state变量名 
+    第二个值是当前操作state的方法
+ 
+  
+```
+- 使用创建的state值 可以像变量一样直接使用  不需要this.state 因为函数组件里面没有this的概念
+```jsx
+console.log(state) 
+也可以传递给子组件
+<ArchiveNav fix={!fix} />
+```
+
+- 操作state的值 
+
+```jsx
+ setFix(true)
+ setFix(false)
+ 操作的时候需要使用useState创建的时候返回的操作函数 
+ (切记) 不可以直接当变量赋值 fix = true 这样的话是无法触发组件更新的
+```
